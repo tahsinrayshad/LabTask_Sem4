@@ -2,12 +2,12 @@ All the lab tasks of my 4th semester are kept in this repository.
 
 # Semester Information
 
-**Semester:** Summer (4th)
-**Academic Year:** 2022-2023
-**Program:** BSc. in Software Engineering
-**Department:** Dept. of Computer Science and Engineering 
-Islamic University of Technology, 
-Board Bazar, Gazipur, Bangladesh
+**Semester:** Summer (4th) <br>
+**Academic Year:** 2022-2023 <br>
+**Program:** BSc. in Software Engineering <br>
+**Department:** Dept. of Computer Science and Engineering  <br>
+Islamic University of Technology,  <br>
+Board Bazar, Gazipur, Bangladesh <br>
 
 
 ## Courses
