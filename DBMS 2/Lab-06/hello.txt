@@ -1,0 +1,112 @@
+DECLARE
+    v_dept_name department.dept_name%TYPE;
+    v_id instructor.id%TYPE;
+    v_new_id instructor.id%TYPE;
+    CURSOR inst_cursor (dept_name_var VARCHAR2) IS
+        SELECT ID
+        FROM instructor
+        WHERE dept_name = dept_name_var
+        ORDER BY name;
+BEGIN
+    -- Loop through each department
+    FOR dept_rec IN (SELECT dept_name FROM department) LOOP
+        v_dept_name := dept_rec.dept_name;
+        
+        -- Retrieve instructors of the department in alphabetical order
+        FOR inst_rec IN inst_cursor(v_dept_name) LOOP
+            v_id := inst_rec;
+            
+            -- Generate new ID using the function
+            v_new_id := generate_student_id(v_dept_name);
+            
+            -- Update instructor ID
+            UPDATE instructor
+            SET ID = v_new_id
+            WHERE ID = v_id;
+            
+            DBMS_OUTPUT.PUT_LINE('Updated ID for instructor ' || v_id || ' in department ' || v_dept_name || ' to ' || v_new_id);
+        END LOOP;
+    END LOOP;
+END;
+/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DECLARE
+    v_dept_name department.dept_name%TYPE;
+    v_id instructor.id%TYPE;
+    v_new_id instructor.id%TYPE;
+BEGIN
+    -- Loop through each department
+    FOR dept_rec IN (SELECT dept_name FROM department) LOOP
+        v_dept_name := dept_rec.dept_name;
+        
+        -- Retrieve instructors of the department in alphabetical order
+        FOR inst_rec IN (SELECT ID
+                         FROM instructor
+                         WHERE dept_name = v_dept_name
+                         ORDER BY name) LOOP
+            v_id := inst_rec.ID;
+            
+            -- Generate new ID using the function
+            v_new_id := generate_student_id(v_dept_name);
+            
+            -- Update instructor ID
+            UPDATE instructor
+            SET ID = v_new_id
+            WHERE ID = v_id;
+            
+            DBMS_OUTPUT.PUT_LINE('Updated ID for instructor ' || v_id || ' in department ' || v_dept_name || ' to ' || v_new_id);
+        END LOOP;
+    END LOOP;
+END;
+/
+
+
+
+
+
+CREATE OR REPLACE TRIGGER instructor_id_trigger
+BEFORE INSERT ON instructor
+FOR EACH ROW
+DECLARE
+    v_new_id instructor.ID%TYPE;
+BEGIN
+    -- Generate new ID using the function
+    v_new_id := generate_student_id(:NEW.dept_name);
+    
+    -- Set the new ID for the newly inserted row
+    :NEW.ID := v_new_id;
+END;
+/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

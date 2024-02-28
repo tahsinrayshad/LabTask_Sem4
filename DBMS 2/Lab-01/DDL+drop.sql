@@ -254,3 +254,34 @@ GROUP BY
     i.ID, i.name, c.course_id, c.title, s.sec_id, t.time_slot_id
 ORDER BY 
     i.ID, c.course_id, s.sec_id;
+
+
+
+
+
+/*
+Decrease the budget of the departments having a budget of more than 99999 by 10%. Then show the number
+of departments that did not get affected. Write a PL/SQl block to do this.
+*/
+SET SERVEROUTPUT ON;
+DECLARE
+	CURSOR c1 IS
+		SELECT dept_name, budget
+		FROM department
+		WHERE budget > 99999;
+	v_dept_name department.dept_name%TYPE;
+	v_budget department.budget%TYPE;
+	v_count NUMBER := 0;
+BEGIN
+	OPEN c1;
+	LOOP
+		FETCH c1 INTO v_dept_name, v_budget;
+		EXIT WHEN c1%NOTFOUND;
+		UPDATE department
+		SET budget = budget * 0.9
+		WHERE dept_name = v_dept_name;
+		v_count := v_count + 1;
+	END LOOP;
+	CLOSE c1;
+	DBMS_OUTPUT.PUT_LINE('Number of departments that did not get affected: ' || v_count);
+END;
