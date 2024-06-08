@@ -37,25 +37,6 @@ create table course
 		on delete set null
 	);
 
-create table time_slot
-	(time_slot_id		varchar(4),
-	 day			varchar(1),
-	 start_hr		numeric(2) check (start_hr >= 0 and start_hr < 24),
-	 start_min		numeric(2) check (start_min >= 0 and start_min < 60),
-	 end_hr			numeric(2) check (end_hr >= 0 and end_hr < 24),
-	 end_min		numeric(2) check (end_min >= 0 and end_min < 60),
-	 primary key (time_slot_id, day, start_hr, start_min)
-	);
-
-create table prereq
-	(course_id		varchar(8), 
-	 prereq_id		varchar(8),
-	 primary key (course_id, prereq_id),
-	 foreign key (course_id) references course (course_id)
-		on delete cascade,
-	 foreign key (prereq_id) references course (course_id)
-	);
-
 create table instructor
 	(ID			varchar(5), 
 	 name			varchar(20) not null, 
@@ -127,5 +108,24 @@ create table advisor
 		on delete set null,
 	 foreign key (s_ID) references student (ID)
 		on delete cascade
+	);
+
+create table time_slot
+	(time_slot_id		varchar(4),
+	 day			varchar(1),
+	 start_hr		numeric(2) check (start_hr >= 0 and start_hr < 24),
+	 start_min		numeric(2) check (start_min >= 0 and start_min < 60),
+	 end_hr			numeric(2) check (end_hr >= 0 and end_hr < 24),
+	 end_min		numeric(2) check (end_min >= 0 and end_min < 60),
+	 primary key (time_slot_id, day, start_hr, start_min)
+	);
+
+create table prereq
+	(course_id		varchar(8), 
+	 prereq_id		varchar(8),
+	 primary key (course_id, prereq_id),
+	 foreign key (course_id) references course (course_id)
+		on delete cascade,
+	 foreign key (prereq_id) references course (course_id)
 	);
 

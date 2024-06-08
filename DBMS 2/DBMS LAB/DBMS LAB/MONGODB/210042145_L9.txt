@@ -1,0 +1,308 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+use SocialMedia
+
+db.createCollection("users", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: ["name", "password", "email"],
+         properties: {
+            name: {
+               bsonType: "string",
+               description: "User's name"
+            },
+            password: {
+               bsonType: "string",
+               description: "User's password"
+            },
+            email: {
+               bsonType: "string",
+               description: "User's email address"
+            },
+            phone: {
+               bsonType: "string",
+               description: "User's phone number"
+            },
+            dob: {
+               bsonType: "date",
+               description: "User's date of birth"
+            },
+            address: {
+               bsonType: "string",
+               description: "User's address"
+            },
+            profileCreationDate: {
+               bsonType: "date",
+               description: "Date when the user profile was created"
+            },
+            workingStatus: {
+               bsonType: "string",
+               description: "User's current working status"
+            },
+            bio: {
+               bsonType: "string",
+               description: "User's biography"
+            },
+            hobbies: {
+               bsonType: ["array"],
+               items: {
+                  bsonType: "string"
+               },
+               description: "User's hobbies"
+            },
+            friends: {
+               bsonType: ["array"],
+               items: {
+                  bsonType: "objectId"
+               },
+               description: "IDs of user's friends"
+            },
+            followers: {
+               bsonType: ["array"],
+               items: {
+                  bsonType: "objectId"
+               },
+               description: "IDs of users who follow this user"
+            }
+         }
+      }
+   }
+})
+
+db.createCollection("posts", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: ["content"],
+         properties: {
+            content: {
+               bsonType: "string",
+               description: "Content of the post"
+            },
+            userId: {
+               bsonType: "objectId",
+               description: "ID of the user who created the post"
+            },
+            creationDate: {
+               bsonType: "date",
+               description: "Date when the post was created"
+            },
+            likes: {
+               bsonType: ["array"],
+               items: {
+                  bsonType: "object",
+                  properties: {
+                     userId: {
+                        bsonType: "objectId",
+                        description: "ID of the user who liked the post"
+                     },
+                     userName: {
+                        bsonType: "string",
+                        description: "Name of the user who liked the post"
+                     }
+                  }
+               },
+               description: "Users who liked the post"
+            },
+            comments: {
+               bsonType: ["array"],
+               items: {
+                  bsonType: "object",
+                  properties: {
+                     userId: {
+                        bsonType: "objectId",
+                        description: "ID of the user who commented on the post"
+                     },
+                     userName: {
+                        bsonType: "string",
+                        description: "Name of the user who commented on the post"
+                     },
+                     comment: {
+                        bsonType: "string",
+                        description: "The comment text"
+                     }
+                  }
+               },
+               description: "Comments on the post"
+            }
+         }
+      }
+   }
+})
+
+
+4no.
+
+
+// (a) Insert an entry of a user with only email, name, and password
+db.users.insertOne({
+   name: "John Doe",
+   email: "johndoe@example.com",
+   password: "password123"
+})
+
+// (b) Insert an entry of a user with basic info and hobbies
+db.users.insertOne({
+   name: "Alice Smith",
+   email: "alice@example.com",
+   password: "alicepassword",
+   dob: new Date("1990-05-15"),
+   hobbies: ["Reading", "Cooking", "Traveling"]
+})
+
+// (c) Insert two entries of users with basic info and telephone number (work and personal)
+db.users.insertMany([
+   {
+      name: "Bob Johnson",
+      email: "bob@example.com",
+      password: "bobpassword",
+      phone: "123-456-7890",
+      dob: new Date("1985-08-20"),
+   },
+   {
+      name: "Emily Wilson",
+      email: "emily@example.com",
+      password: "emilypassword",
+      phone: "987-654-3210",
+      dob: new Date("1992-03-10"),
+   }
+])
+
+// (d) Insert four posts with the content and creation time
+db.posts.insertMany([
+   {
+      content: "Just finished a great book!",
+      userId: ObjectId("60f653ff6fc0a12345678901"),
+      creationDate: new Date("2024-04-01T09:30:00Z"),
+      likes: [],
+      comments: []
+   },
+   {
+      content: "Enjoying the beautiful sunset.",
+      userId: ObjectId("60f653ff6fc0a12345678902"), 
+      creationDate: new Date("2024-04-02T18:45:00Z"),
+      likes: [],
+      comments: []
+   },
+   {
+      content: "Excited for my upcoming trip to Europe!",
+      userId: ObjectId("60f653ff6fc0a12345678903"), 
+      creationDate: new Date("2024-04-03T11:20:00Z"),
+      likes: [],
+      comments: []
+   },
+   {
+      content: "Working on a new project.",
+      userId: ObjectId("60f653ff6fc0a12345678904"), 
+      creationDate: new Date("2024-04-03T14:00:00Z"),
+      likes: [],
+      comments: []
+   }
+])
+
+
+
+
+5no.
+
+// (a) Add multiple followers for multiple users
+db.users.updateMany(
+   { name: { $in: ["Alice Smith", "Bob Johnson"] } }, // Update users Alice Smith and Bob Johnson
+   { $push: { followers: { $each: [ObjectId("follower_id_1"), ObjectId("follower_id_2")] } } }
+)
+
+// (b) Add multiple friends for multiple users
+db.users.updateMany(
+   { name: { $in: ["Alice Smith", "Bob Johnson"] } }, // Update users Alice Smith and Bob Johnson
+   { $push: { friends: { $each: [ObjectId("friend_id_1"), ObjectId("friend_id_2")] } } }
+)
+
+// (c) Add multiple users who like a post
+db.posts.updateOne(
+   { content: "Just finished a great book!" }, // Update the post with this content
+   { $push: { likes: { $each: [{ userId: ObjectId("liker_id_1"), userName: "Liker1" }, { userId: ObjectId("liker_id_2"), userName: "Liker2" }] } } }
+)
+
+// (d) Add at least two comments for two posts with the commenters
+db.posts.updateMany(
+   { content: { $in: ["Enjoying the beautiful sunset.", "Excited for my upcoming trip to Europe!"] } }, // Update posts with these contents
+   { 
+      $push: { 
+         comments: { 
+            $each: [
+               { userId: ObjectId("commenter_id_1"), userName: "Commenter1", comment: "Beautiful picture!" },
+               { userId: ObjectId("commenter_id_2"), userName: "Commenter2", comment: "Wish you a great trip!" }
+            ]
+         } 
+      } 
+   }
+)
+
+
+
+
+
+6no.
+
+// (a) Display the total number of posts
+db.posts.count()
+
+// (b) Display the most recent to oldest posts along with their poster(s)
+db.posts.aggregate([
+   { $lookup: { from: "users", localField: "userId", foreignField: "_id", as: "poster" } },
+   { $sort: { creationDate: -1 } }
+])
+
+// (c) Show all the posts that were created from yesterday
+var yesterday = new Date();
+yesterday.setDate(yesterday.getDate() - 1);
+db.posts.find({ creationDate: { $gte: yesterday } })
+
+// (d) Show all the users who are following more than 3 users
+db.users.find({ $expr: { $gt: [{ $size: "$followers" }, 3] } })
+
+// (e) Show all the users who were born within 1990-2000
+var startDate = new Date("1990-01-01");
+var endDate = new Date("2000-12-31");
+db.users.find({ dob: { $gte: startDate, $lte: endDate } })
+
+// (f) Show three profiles that were created the earliest
+db.users.find().sort({ profileCreationDate: 1 }).limit(3)
+
+// (g) Show all the posts where commenter "ABC" commented
+db.posts.find({ "comments.userName": "ABC" })
+
+// (h) Show the user’s detail who posted "Life is too good"
+var post = db.posts.findOne({ content: "Life is too good" });
+if (post) {
+   db.users.findOne({ _id: post.userId });
+} else {
+   print("Post not found.");
+}
+
+
+
+
+
+
+7no.
+
+
+db.users.deleteMany({ $and: [{ phone: { $exists: false } }, { "phone": { $ne: null } }] })
+
+
+

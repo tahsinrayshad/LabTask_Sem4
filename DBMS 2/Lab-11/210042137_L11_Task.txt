@@ -1,0 +1,102 @@
+-- 1. Customer Creation
+
+create (c:customer {customer_id: 102, name : 'John', phone_no: 1234567890, age: 30, gender: 'Male', country: 'USA' })
+
+create (c1:customer {customer_id: 123, name : 'Alice', phone_no: 9876543210, age: 25, gender: 'Female', country: 'UK'}),
+(c2:customer {customer_id: 311, name : 'Bob', phone_no: 5555555555, age: 40, gender: 'Male', country: 'Canada'})
+
+
+-- 2. Create Author
+
+create(a:author {author_name: 'J.K. Rowling', country: 'UK'})
+
+-- 3. Create Book
+
+create(b1:book{isbn: '1408855652', title: 'Harry Potter and the Philosopher Stone', genre: 'Fantasy', published_year: 1997, price: 9.99}),
+(b2:book{isbn: '0439064866', title: 'Harry Potter and the Chamber of Secrets', genre: 'Fantasy', published_year: 1998, price: 10.99})
+
+
+
+-- 4. Creating Wrote Relationship
+
+match (a:author {author_name: 'J.K. Rowling'}), (b:book {isbn: '1408855652'})
+create (a)-[w:wrote]->(b)
+
+match (a:author {author_name: 'J.K. Rowling'}), (b:book {isbn: '0439064866'})
+create (a)-[w:wrote]->(b)
+
+
+-- 5. Create Book with Author: (hint: creating nodes and edge at a time) 
+
+create(a:author{author_name: 'Stephen King', country: 'USA'})-[w:wrote]->(b:book{isbn: '1982102319', title: 'The Shining', genre: 'Horror', published_year: 1977, price: 12.99})
+
+create(a:author{author_name: 'Agatha Christie', country: 'UK'})-[w:wrote]->(b:book{isbn: '0062073492', title: 'Murder on the Orient Express', genre: 'Mystery', published_year: 1934, price: 8.99})
+
+
+-- 6. Create Purchased Relation
+
+match (c:customer{customer_id:123}), (b:book{isbn:'1408855652'})
+create (c)-[p:purchased{amount: 3}] ->(b)
+
+match (c:customer{customer_id:123}), (b:book{isbn:'0439064866'})
+create (c)-[p:purchased{amount: 1}] ->(b)
+
+match (c:customer{customer_id:311}), (b:book{isbn:'0062073492'})
+create (c)-[p:purchased{amount: 1}] ->(b)
+
+match (c:customer{customer_id:102}), (b:book{isbn:'0062073492'})
+create (c)-[p:purchased{amount: 1}] ->(b)
+
+
+--  7. Create ‘rated’ relation
+
+match (c:customer{customer_id:123}), (b:book{isbn:'1408855652'})
+create (c)-[r:rated{rating: 5, rating_date: date('2021-02-11')}] ->(b)
+
+match (c:customer{customer_id:311}), (b:book{isbn:'1408855652'})
+create (c)-[r:rated{rating: 5, rating_date: date('2022-04-19')}] ->(b)
+
+match (c:customer{customer_id:311}), (b:book{isbn:'0062073492'})
+create (c)-[r:rated{rating: 4, rating_date: date('2024-01-09')}] ->(b)
+
+match (c:customer{customer_id:102}), (b:book{isbn:'0062073492'})
+create (c)-[r:rated{rating: 5, rating_date: date('2023-04-04')}] ->(b)
+
+match (c:customer{customer_id:123}), (a:author{author_name:'J.K. Rowling'})
+create (c)-[r:rated{rating: 5, rating_date: date('2021-03-12')}] ->(a)
+
+match (c:customer{customer_id:123}), (a:author{author_name:'Stephen King'})
+create (c)-[r:rated{rating: 2, rating_date: date('2023-03-18')}] ->(a)
+
+
+-- 8. Create ‘follows’ relation
+
+match (c1:customer{customer_id:123}), (c2:customer{customer_id:311})
+create (c1)-[f:follows]->(c2)
+
+match (c1:customer{customer_id:311}), (c2:customer{customer_id:123})
+create (c1)-[f:follows]->(c2)
+
+match (c1:customer{customer_id:311}), (c2:customer{customer_id:102})
+create (c1)-[f:follows]->(c2)
+
+match (c:customer{customer_id:123}), (a:author{author_name: 'J.K. Rowling'})
+create (c)-[f:follows]->(a)
+
+match (c:customer{customer_id:311}), (a:author{author_name: 'Agatha Christie'})
+create (c)-[f:follows]->(a)
+
+match (c:customer{customer_id:102}), (a:author{author_name: 'Agatha Christie'})
+create (c)-[f:follows]->(a)
+
+-- 10. Data Retrieval
+
+-- (a) Find all the ‘rated’ books node with associated the customers.
+
+match (c:customer)-[r:rated]->(b:book)
+return c, r, b
+
+-- (b) Find all the ‘follows’ relation.
+
+match (c1:customer)-[f:follows]->()
+return c1, f

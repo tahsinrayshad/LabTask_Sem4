@@ -1,0 +1,25 @@
+1. Peek Finding
+2. Sorting
+	-> bubble, 
+    -> heap, 
+    -> merge, 
+    -> insertion, 
+    -> bucket, 
+    -> radix, 
+    -> counting, 
+    -> quick
+3. BFS, DFS
+4. Shortest Path 
+    -> dijkastra, 
+    -> foyld warshall, 
+    -> belmanford
+5. MST 
+    -> Prim , 
+    -> Kruskal
+6. Topological Sort
+7. Maximum Sub-array Sum
+8. Fibonacci (DP)
+9. Rod Cutting (DP)
+10. Longest Common Sub-Array (DP)
+11. 0-1 knap-sac (DP)
+12. Coin change (DP)

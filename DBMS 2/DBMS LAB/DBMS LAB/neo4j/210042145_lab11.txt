@@ -1,0 +1,174 @@
+4:
+MATCH (a:Author {auth_name: 'J.K. Rowling'}), (b:Book {isbn: '1408855652'})
+CREATE (a)-[:wrote]->(b)
+
+MATCH (a:Author {auth_name: 'J.K. Rowling'}), (b:Book {isbn: '0439064866'})
+CREATE (a)-[:wrote]->(b)
+
+5:
+a.
+ CREATE (a:Author {auth_name: 'Stephen King', country: 'USA'})-[:wrote]->(b:Book {isbn: '1982102319', title: 'The Shining', genre: 'Horror', published_year: 1977, price: 12.99})
+
+b. 
+CREATE (a:Author {auth_name: 'Agatha Christie', country: 'UK'})-[:wrote]->(b:Book {isbn: '0062073492', title: 'Murder on the Orient Express', genre: 'Mystery', published_year: 1934, price: 8.99})
+
+6:
+a. 
+MATCH (c:Customer {customer_id: 123}), (b:Book {isbn: '1408855652'})
+CREATE (c)-[:purchased {amount: 3}]->(b)
+
+b. 
+MATCH (c:Customer {customer_id: 123}), (b:Book {isbn: '0439064866'})
+CREATE (c)-[:purchased {amount: 1}]->(b)
+
+c. 
+MATCH (c:Customer {customer_id: 311}), (b:Book {isbn: '0062073492'})
+CREATE (c)-[:purchased {amount: 1}]->(b)
+
+d. 
+MATCH (c:Customer {customer_id: 102}), (b:Book {isbn: '0062073492'})
+CREATE (c)-[:purchased {amount: 1}]->(b)
+
+7:
+
+
+MATCH (c:Customer {customer_id: 123}), (b:Book {isbn: '1408855652'})
+CREATE (c)-[:rated {rating: 5, rating_date: date('2021-02-11')}]->(b)
+
+MATCH (c:Customer {customer_id: 311}), (b:Book {isbn: '1408855652'})
+CREATE (c)-[:rated {rating: 3, rating_date: date('2022-04-19')}]->(b)
+
+MATCH (c:Customer {customer_id: 311}), (b:Book {isbn: '0062073492'})
+CREATE (c)-[:rated {rating: 4, rating_date: date('2024-01-09')}]->(b)
+
+MATCH (c:Customer {customer_id: 102}), (b:Book {isbn: '0062073492'})
+CREATE (c)-[:rated {rating: 5, rating_date: date('2023-04-04')}]->(b)
+
+
+MATCH (c:Customer {customer_id: 123}), (a:Author {auth_name: 'J.K. Rowling'})
+CREATE (c)-[:rated {rating: 5, rating_date: date('2021-03-12')}]->(a)
+
+MATCH (c:Customer {customer_id: 123}), (a:Author {auth_name: 'Stephen King'})
+CREATE (c)-[:rated {rating: 2, rating_date: date('2023-03-18')}]->(a)
+
+
+
+8:
+
+a.
+MATCH (c1:Customer {customer_id: 123}), (c2:Customer {customer_id: 311})
+CREATE (c1)-[:FOLLOWS]->(c2)
+
+b.
+MATCH (c1:Customer {customer_id: 311}), (c2:Customer {customer_id: 123})
+CREATE (c1)-[:FOLLOWS]->(c2)
+
+c.
+MATCH (c1:Customer {customer_id: 311}), (c2:Customer {customer_id: 102})
+CREATE (c1)-[:FOLLOWS]->(c2)
+
+d.
+MATCH (c:Customer {customer_id: 123}), (a:Author {auth_name: 'J.K. Rowling'})
+CREATE (c)-[:FOLLOWS]->(a)
+
+e.
+MATCH (c:Customer {customer_id: 311}), (a:Author {auth_name: 'Agatha Christie'})
+CREATE (c)-[:FOLLOWS]->(a)
+
+f.
+MATCH (c:Customer {customer_id: 102}), (a:Author {auth_name: 'Agatha Christie'})
+CREATE (c)-[:FOLLOWS]->(a)
+
+
+9. Dumped
+
+10.
+a. Find all the ‘rated’ books node with associated the customers.
+MATCH (c:Customer)-[r:rated]->(b:Book)
+RETURN c, r, b
+
+b. Find all the ‘follows’ relation.
+MATCH (c1)-[:FOLLOWS]->(c2)
+RETURN c1, c2
+
+c. Find the average rating of ‘Harry Potter and the Philosopher’s Stone’.
+
+MATCH (b:Book {title: 'Harry Potter and the Philosopher’s Stone'})<-[r:rated]-()
+RETURN avg(r.rating) AS average_rating
+
+d. Find the name of the second expensive book.
+MATCH (b:Book)
+WITH b
+ORDER BY b.price DESC
+SKIP 1
+LIMIT 1
+RETURN b.title AS second_expensive_book
+
+e.
+Find the name of customer who bought books of the authors they follow along with the
+amount.
+
+match (c:Customer)-[f:follows]->(a:Author)-[w:Wrote]->(b:Book)<-[p:purchased]-(c)
+return c.name,sum(b.price) as SpentAmount
+
+f.
+Find the customer who both rated the books of J.K. Rowling and follows her.
+
+match(c:Customer)-[r:rated]->(a:Author{auth_name:'J.K. Rowling'}),(c)-[f:follows]->(a)
+return c
+
+g.
+Find the latest rated author.
+
+MATCH (c:Customer)-[r:rated]->(a:Author)
+with r,a
+ORDER BY r.rating_date DESC
+LIMIT 1
+RETURN a.auth_name AS latestRatedAuthor
+
+f.
+Find the name of authors who write books of Mystery or Fantasy genre along with author’s
+rating. [hint: use optional before the MATCH which may or may not be present]
+
+MATCH (a:Author)-[w:Wrote]->(book:Book)
+OPTIONAL MATCH (a)<-[r:rated]-(Customer)
+WHERE book.genre IN ['Mystery', 'Fantasy']
+RETURN a.auth_name AS authorName,sum(r.rating) AS authorRating
+
+
+11. Data Update---------
+(a) Add a new label playwright for ‘Agatha Christie’.
+
+MATCH (a:Author {auth_name: 'Agatha Christie'})
+SET a:Playwright
+
+(b) Modify the published year to 1980 for the book titled "The Shining."
+
+MATCH (book:Book {name: 'The Shining'})
+SET book.published_year = 1980
+
+
+
+(c) Update the relationship attribute from "rating" to "star" while retaining the same value
+for the rating attribute in the relationship between customers and authors.
+
+MATCH (Customer)-[old:rated]->(Author)
+SET old.star = old.rating
+REMOVE old.rating
+
+
+
+12....
+
+(a) Delete the author ‘Stephen King’.
+MATCH (author:Author {auth_name: 'Stephen King'})
+DETACH DELETE author
+
+(b) Delete all the customer to customer ‘follows’ relation.
+MATCH (:Customer)-[follows:FOLLOWS]->(:Customer)
+DELETE follows
+
+(c) Delete all the rating (relation) that occurred before 2022.
+MATCH (:Customer)-[r:rated]->(:Author)
+WHERE r.rating_date < date("2022-01-01")
+DELETE r
